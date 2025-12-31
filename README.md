@@ -271,16 +271,7 @@ MathProblemSolver/
 ### Customizing Classification
 Edit the classification prompt in [nodes/classifier.py](backend/nodes/classifier.py) to adjust routing logic.
 
-## Future Enhancements
 
-- [ ] Web interface for easy interaction
-- [ ] Support for image-based math problems
-- [ ] RAG integration to query knowledge base during problem solving
-- [ ] Integration with additional computational engines (NumPy, SciPy)
-- [ ] Persistent checkpointing with database backend
-- [ ] Multi-user authentication and session management
-- [ ] Export solutions to PDF/LaTeX
-- [ ] Visualization of mathematical graphs and plots
 
 ## Troubleshooting
 
@@ -298,15 +289,3 @@ Make sure you're running from the backend directory or adjust your PYTHONPATH:
 ```bash
 export PYTHONPATH="${PYTHONPATH}:/path/to/MathProblemSolver/backend"
 ```
-
-## License
-
-[Add your license here]
-
-## Contributing
-
-[Add contribution guidelines here]
-
-## Contact
-
-[Add contact information here]
