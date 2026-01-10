@@ -4,8 +4,9 @@ import numpy as np
 from scipy.integrate import quad
 from scipy.optimize import minimize
 from langchain.tools import tool
-from typing import Optional, List, Tuple, Callable
+from typing import Optional, List, Tuple, Callable, Dict, Any
 from models.chat import ChatState
+from langgraph.prebuilt import ToolNode 
 import httpx 
 import sympy as sp
 
@@ -97,6 +98,8 @@ def universal_math_solver(
 
     except Exception as e:
         return {"error": str(e)}
+    
+universal_math_solver_node = ToolNode([universal_math_solver])
 
 def complex(state:ChatState)->ChatState:
     system_prompt=f""" 
