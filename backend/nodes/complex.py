@@ -9,6 +9,8 @@ from models.chat import ChatState
 from langgraph.prebuilt import ToolNode 
 import httpx 
 import sympy as sp
+from openai import OpenAI
+import os
 
 
 async def search_knowledgebase(query: str) -> str:
@@ -100,6 +102,10 @@ def universal_math_solver(
         return {"error": str(e)}
     
 universal_math_solver_node = ToolNode([universal_math_solver])
+client = OpenAI(
+    api_key=os.getenv("GEMINI_API_KEY"),
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+)
 
 def complex(state:ChatState)->ChatState:
     system_prompt=f""" 
@@ -122,5 +128,21 @@ def complex(state:ChatState)->ChatState:
 
 Explain the solution step by step in a clear and logical manner.
     """
+    response = client.chat.completions.create(
+    model="gemini-2.5-flash",
+    messages=[
+        {   "role": "system",
+            "content": system_prompt
+        },
+        {
+            "role": "user",
+            "content":state["query"]
+        }
+    ]
+)
+
+    llm_response=response.choices[0].message
+    state=state["llm_response"]
+    return state
 
 

@@ -1,22 +1,26 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
 from models.chat import ChatState
+from typing import Literal
 import os
+from pydantic import BaseModel
+from openai import OpenAI
 from dotenv import load_dotenv
 load_dotenv()
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash-exp",
-    temperature=0,
-    google_api_key=os.getenv("GOOGLE_API_KEY")
+client = OpenAI(
+    api_key=os.getenv("GEMINI_API_KEY"),
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
-def query_classifier(state: ChatState) -> ChatState:
+class queryclassifier(BaseModel):
+    is_complex:bool
+
+def query_classifier(state: ChatState) ->ChatState:
     classification_prompt = f"""
     You are a classifier.
 
     Analyze the user's query and classify whether it is:
-    - simple
-    - complex
+    {{ "is_complex": true }} or {{ "is_complex": false }}
 
     Guidelines:
 
@@ -46,20 +50,31 @@ def query_classifier(state: ChatState) -> ChatState:
 
     Rules:
     - Respond with **only one of these two outputs**:
-    simple
-    complex
+    {{ "is_complex": true }} or {{ "is_complex": false }}
     - Do NOT provide explanations.
 
     User query:
-    {state["question"]}
+    {state["query"]}
     """
-    response = llm.invoke([HumanMessage(content=classification_prompt)])
-    classification = response.content.strip().lower()
+    response = client.beta.chat.completions.parse(
+    model="gemini-2.5-flash",
+    response_format=queryclassifier,
+    messages=[
+        {   "role": "system",
+            "content": classification_prompt
+        },
+        {
+            "role": "user",
+            "content": state["query"]
+        }
+    ]
+)
 
-    # ✅ Update state
-    state["route"] = classification
-
+    is_complex=response.choices[0].message.parsed.is_complex
+    state["is_complex"]=is_complex
     return state
+
+   
 
     
     

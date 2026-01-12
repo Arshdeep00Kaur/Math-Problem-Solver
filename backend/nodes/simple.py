@@ -2,12 +2,12 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
 from models.chat import ChatState
 import os
+from openai import OpenAI
 from dotenv import load_dotenv
 load_dotenv()
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash-exp",
-    temperature=0,
-    google_api_key=os.getenv("GOOGLE_API_KEY")
+client = OpenAI(
+    api_key=os.getenv("GEMINI_API_KEY"),
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
 def simple(state:ChatState)->ChatState:
@@ -42,5 +42,23 @@ def simple(state:ChatState)->ChatState:
     6. solve mathematical problems clearly and accurately.
 
     """
-    ai_msg = llm.invoke(system_prompt)
+    query=state["query"]
+    response = client.chat.completions.create(
+    model="gemini-2.5-flash",
+    reasoning_effort="low",
+    messages=[
+        {   "role": "system",
+            "content": system_prompt
+        },
+        {
+            "role": "user",
+            "content": query
+        }
+    ]
+)
+
+    llm_response=response.choices[0].message
+    state=state["llm_response"]
+    return state
+    
     

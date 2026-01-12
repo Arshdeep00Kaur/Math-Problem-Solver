@@ -10,6 +10,7 @@ class ChatState(TypedDict):
     # Conversation history tracked by LangGraph's add_messages reducer
     messages: Annotated[List[AnyMessage], add_messages]
     # Latest user question the graph is handling
-    question: str
+    query: str
     # Routing decision (e.g., "simple" or "complex")
-    route: Optional[str]
+    is_complex:bool
+    llm_response:str
